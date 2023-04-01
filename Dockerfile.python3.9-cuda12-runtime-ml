@@ -1,0 +1,12 @@
+FROM python3.9-cuda12-runtime:api
+
+ENV LANG en_US.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install --no-install-recommends -y  python3.9-dev
+
+RUN pip install --upgrade pip && \
+    pip install fasttext fastlangid nltk rouge_score
+    
+RUN pip install spacy transformers[torch] transformers==4.23.1 hydra-core==1.2.0 torchutils
+
