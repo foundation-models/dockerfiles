@@ -1,0 +1,18 @@
+FROM python3.9-cuda12-runtime:ml
+
+ENV LANG en_US.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG USER_ID=1000
+ARG USERS_GID=100
+ARG USER=agent
+
+RUN useradd -m ${USER} --uid=${USER_ID} &&  \
+	echo "${USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+	adduser ${USER} users && adduser ${USER} sudo && \
+	usermod --shell /usr/bin/bash ${USER} 
+
+user ${USER}
+WORKDIR /home/${USER}
+
+
