@@ -1,0 +1,17 @@
+FROM python3.9-cuda12-runtime:non-root-ml
+
+ENV LANG en_US.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+ARG USER=agent
+
+
+ENV PYTHONPATH=/home/${USER}/src
+
+COPY ./src /home/${USER}/src
+COPY ./models /home/${USER}/models
+COPY ./Jenkinsfile /home/${USER}/Jenkinsfile
+ENV XDG_CACHE_HOME=/opt
+WORKDIR /home/${USER}/src
+
+RUN sudo chown -R ${USER}:${USER} /home/${USER}
+
