@@ -7,6 +7,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN pip install --upgrade pip && \
     pip install hydra-core pandas numpy scipy scikit-learn matplotlib seaborn \
         bs4 lxml unicodedata2 pandas loguru openpyxl requests lxml tqdm autopep8 \
-        gunicorn uvicorn[standard] asyncio fastapi fastapi_utils \
+        gunicorn uvicorn[standard] asyncio fastapi fastapi_utils prometheus_client \
         dvc dvc-s3 \
         confluent-kafka kafka-python
