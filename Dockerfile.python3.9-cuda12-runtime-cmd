@@ -1,0 +1,8 @@
+FROM python3.9-cuda12-runtime:model
+
+ENV LANG en_US.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+ARG USER=agent
+ENV version=23.03.26.18.47-good_models
+
+CMD ["python", "/home/${USER}/src/api/fast_ml_api.py"]

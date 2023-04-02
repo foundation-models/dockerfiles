@@ -2,7 +2,7 @@
 # export docker_repo=hossein20s/ai
 
 
-for TAG in base api ml non-root-ml app
+for TAG in base api ml non-root-ml model cmd
 do
     # docker pull "$docker_repo"/python3.9-cuda12-runtime:$TAG
     # docker tag "$docker_repo"/python3.9-cuda12-runtime:$TAG python3.9-cuda12-runtime:$TAG
