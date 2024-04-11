@@ -1,0 +1,134 @@
+task: token_classification
+
+model_input: bert-base-multilingual-cased
+
+
+
+language: en
+startup_pipelines: [ en_segmentation_pipeline, en_ner_pipeline, zh_hans_segmentation_pipeline, zh_hant_segmentation_pipeline, zh_hans_ner_pipeline, zh_hant_ner_pipeline ]
+
+pipelines:
+  en_segmentation_pipeline:
+    _target_: transformers.pipeline
+    task: ner
+    tokenizer: bert-base-multilingual-cased
+    model: /home/agent/models/en/sig-segmentation-multiling-en
+    framework: pt
+    device: 0 # default is -1 which is using only CPU
+  zh_hans_segmentation_pipeline:
+    _target_: transformers.pipeline
+    task: ner
+    tokenizer: bert-base-multilingual-cased
+    model: /home/agent/models/zh_hans/signature-extraction-zh_hans
+    framework: pt
+    device: 0
+  zh_hant_segmentation_pipeline:
+    _target_: transformers.pipeline
+    task: ner
+    tokenizer: bert-base-multilingual-cased
+    model: /home/agent/models/zh_hant/signature-multiling-zh-hant
+    framework: pt
+    device: 0
+  en_ner_pipeline:
+    _target_: transformers.pipeline
+    task: ner
+    tokenizer: bert-base-multilingual-cased
+    model: /home/agent/models/en/sig_ner_en
+    framework: pt
+    device: 0
+  zh_hans_ner_pipeline:
+    _target_: transformers.pipeline
+    task: ner
+    tokenizer: bert-base-multilingual-cased
+    model: /home/agent/models/zh_hans/sig_ner_chinese
+    framework: pt
+    device: 0
+  zh_hant_ner_pipeline:
+    _target_: transformers.pipeline
+    task: ner
+    tokenizer: bert-base-multilingual-cased
+    model: /home/agent/models/zh_hant/ner_chinese_traditional
+    framework: pt
+    device: 0
+
+
+spacy:
+  disable: ["ner", "textcat", "custom"]
+  # The rest of tha names need to be consistent with the "full_name" properties from the "pipelines"
+  languages:
+    en: en_core_web_sm
+    zh-hans: zh_core_web_sm
+    zh-hant: zh_core_web_sm
+    zh_hans: zh_core_web_sm
+    zh_hant: zh_core_web_sm
+    fr: fr_core_news_sm
+    pt: pt_core_news_sm
+    es: es_core_news_sm
+    ja: ja_core_news_sm
+    it: it_core_news_sm
+    nl: nl_core_news_sm
+    de: de_core_news_sm
+    ru: ru_core_news_sm
+
+language_map:
+  cn: zh-hans
+  cn-tr: zh-hant
+  zh_hans: zh-hans
+  zh_hant: zh-hant
+  zh: zh-hans
+
+valid_languages:
+  - en
+  - zh-hans
+  - zh-hant
+  - zh_hans
+  - zh_hant
+
+
+regex_ner:
+  aggregate:
+    ml: ["NAME_GIVEN", "NAME_MIDDLE", "NAME_SURNAME", "NAME_PREFIX", "NAME_SUFFIX", "JOB_TITLE", "ORGANIZATION", "ADDRESS_STREET", "PHONE_MOBILE", "PHONE_OFFICE", "PHONE_HOME", "PHONE_FAX", "ADDRESS_POSTAL_CODE"]
+    regex: ["EMAIL", "URL", "LINKEDIN"]
+    nf: ["COUNTRY", "STATE", "CITY"]
+    blacklist: ["Mobile", "Office", "City", "Fax", "Success", "Management", "County", "State", "Home", "Name", "Address", "Street", "Country", "Postal", "Code", "Zip", "Point", "Drive", "Court"]
+  phone:
+    us: '((?:\+\d{1,3}[-\.\s]??|\d{4}[-\.\s]??)?(?:\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4}))'
+    uk: '^(\+?44)?(?=(.*?\d){10,})( ?\(\d+\))?[ \d]+(#\d+)?$'
+    ca: '((?:\+\d{1,3}[-\.\s]??|\d{4}[-\.\s]??)?(?:\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4}))'
+    chn: '(?:\+?86)?1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[0-35-9]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|6[2567]\d{2}|4(?:(?:10|4[01])\d{3}|[68]\d{4}|[579]\d{2}))\d{6}$'
+  fax:
+    us: '(fax:|Fax:|f:|F:|F.|f.|F-|f-|Fax |fax )\s?((?:\+\d{1,3}[-\.\s]??|\d{4}[-\.\s]??)?(?:\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4}))'
+  email: '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+  web: '((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*'
+  linkedin: '((http(s?)://)*([a-zA-Z0-9\-])*\.|[linkedin])[linkedin/~\-]+\.[a-zA-Z0-9/~\-_,&=\?\.;]+[^\.,\s<]'
+  name_finder_path: countries.json
+
+ner_metrics:
+  standard_tags_names: ['NAME_PREFIX','NAME_GIVEN','NAME_SURNAME','NAME_MIDDLE','NAME_SUFFIX','JOB_TITLE', 'ORGANIZATION','ADDRESS_STREET','ADDRESS_CITY','ADDRESS_COUNTRY_DIVISION','ADDRESS_COUNTRY', 'ADDRESS_POSTAL_CODE','PHONE_EXTENSION','PHONE_OFFICE','PHONE_MOBILE','PHONE_HOME','PHONE_FAX', 'PHONE_SOCIAL','PHONE_VOICE_MAIL','PHONE_TIE_LINE','PHONE_PAGER','URL','EMAIL', 'LINKEDIN', 'UNKNOWN']
+  leaderboard_weighted_averages_tags: ['MODEL', 'TEST_DATASET', 'ENTITIES_NUMBER', 'PRECISION', 'RECALL', 'F1-MEASURE', 'MODEL_VERSION']
+  full_leaderboard_columns: ['MODEL' ,'TEST_DATASET', 'ADDRESS_CITY', 'ADDRESS_COUNTRY', 'ADDRESS_POSTAL_CODE', 'ADDRESS_STREET', 'EMAIL', 'ORGANIZATION', 'URL', 'PHONE_MOBILE', 'PHONE_OFFICE','JOB_TITLE', 'NAME_GIVEN', 'NAME_SURNAME', 'LAST_UPDATE', "MODEL_VERSION"]
+  performance_columns: ['Entity', 'TP', 'FP', 'FN', 'PRECISION', 'RECALL', 'F1-MEASURE']
+  standard_email_data: ['email_id', 'email_body_text', 'signature_block', 'signature_block_ner', 'NER_id']
+
+signature_construction:
+  minimum_char_length_between_infered_blocks: 10
+
+setence_segementation_limit:
+  # training: 250
+  inference: 400
+
+hydra:
+  run:
+    dir: . # implementing overrides.append("hydra.run.dir: .") from hydra_runner in nemo package
+  # verbose: True
+
+defaults:
+  - _self_
+  - override hydra/job_logging: custom
+
+server:
+  host: 0.0.0.0
+  port: 8080
+
+console_path: console.log
+
